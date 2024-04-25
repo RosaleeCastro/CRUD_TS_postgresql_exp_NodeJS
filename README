@@ -1,0 +1,179 @@
+aso 1. Crea un archivo
+paso 2. npm init -y
+paso 3. Comando de instalación de TypeScript npm i typescript -D  para dependencia de desarrollo.
+paso 4. crear la carpeta src para ejecutar el codigo 
+paso 5. para probar hacemos un console.log y para ejecutarlo necesitamos comonado 
+paso 6. npx tsc --init    es del modulo de typescript  de node, es un compliador
+	esrto le dice a typescript hacia que entorno va compliar
+	Aqui nos muestra el archivo tsconfig.json
+
+	Created a new tsconfig.json with:                                                                                       
+                                                                                                                     	TS 
+  	target: es2016
+  	module: commonjs
+  	strict: true
+  	esModuleInterop: true
+  	skipLibCheck: true
+  	forceConsistentCasingInFileNames: true
+
+
+	You can learn more at https://aka.ms/tsconfig 
+Paso 7. Se modifica o se descomenta algunoas opciones en el tsconfig
+
+Paso 8.  nuevamente npx tsc  esto genera la carpeta dist copn el archi index.js 
+
+Paso 9.  Instalacion de modulos
+	npm i express pg
+
+Paso 10  Importarlos para usar express y pg
+
+	import express   from 'express'
+	empezadmos a ejecutarlo const app = express();
+
+Paso 11  Tenemos que intalar porque typescript no sabe como funciona por eso instalamos los tipos de daros de express para TS
+	npm i --save-dev @types/express -D
+
+Paso 12   Para ser mas agiles en la compilación cambiamos en el package.json  
+		 "scripts": {
+		    "build": "tsc"
+  			},
+Paso 13 Asi ya compilamos con el npm run build
+
+Paso 14   Hacemos la instalacion del nodemon que es un modulo  que va compilar cambios cada vez que se 	realicen de forma automatica.
+			
+	npm i nodemon -D
+
+Paso 15  Para que escuche nuestro archivo creo un script 
+	"dev": "nodemon dist/index.js",
+
+Paso 16  Instalar un modulo que me permite ejectar multiples comandos 	
+	npm  i concurrently  -D  
+
+	Despues hacer estos cambios en el script
+
+
+-********************************************
+
+Pasos para trabajar con postgresql
+
+ 1. Abrir otra consola y ejecutar el siguiente comando 
+	sudo -u postgres psql
+	
+2. Creamos una carpeta llamamda database con un archivo del mismo nombre con extensión sql.
+
+3. iniciiar la creación de la base de datos en la nueva consola pero colocando los comandos en el archivo sql 
+
+4. hacer el cambio en la consola a la base de datos que hemos creado.
+
+5. Iniciar la cración de la base y las tablas en la terminal.
+
+
+***************************************************************
+Conexión con el modulo pg
+
+1. Regresar a la otra terminal 
+
+2. Crear en el src un archivo para la conxión a la base de datos  
+ en mi caso db.ts
+3. iniciar la conexión a la base de datos 
+ import {} from 'pg'
+	pero tenemos que ejecutar el comando  
+npm i --save-dev @types/pg
+npm i @types/pg -D
+
+
+https://node-postgres.com/apis/pool
+ 4. Ahora importo a la clase Pool y genero un ainstancia con la data de la conexión 
+	new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'typescriptdatabase',
+    password: 'postgres',
+    port: 5432
+})
+
+     Lo asigno a una variable. y se le exporta. Con esto ya tengo listo todo para hacer consultas ya que Pool es un objeto que tiene propiedades que me van a permitir hacer consultas 
+
+ 5. Ahora creo una carpeta routes con un archivi index.ts para generar las rutas.
+
+	Aqui en el archivo index.ts  importaremos  un moddulo Router de express que nos va permitir al ejecutarlo darnos un objeto que me va permitir poder crear rutas para mi servidor 
+
+	import{ Router }from 'express';
+6.Para hacerlo llamao al modulo para poder trabajar con sus propiedades 
+	
+	const router = Router();
+7. Creo mi primera ruta 
+	outer.get('/test', (req, res) => {
+    res.send('Hello World');})
+
+8. Para probarlo ir al index. ts principal 
+
+
+******************************************************
+
+9. Antes de las rutas en el index principal usamos lo midellwears  funciones que se ejecutan antes de llegar a las rutas 
+
+ejm  app.use(express.json());  // sve para convertir los datos a json res api
+app.use(express.urlencoded({extended: false})); // para lo mismo con pero desde un formulario html
+
+10. Ahora puedes empezar a definir las rutas 
+
+11 Se defininen laa rutas   se crea un archivo Controlers para crear un afuncion que se efectur cuando vamos a las rutas 
+
+12 despues de esto ya podermos enrutar urls. 
+
+
+/////////////////////////////////////////////////////////
+
+Operaciones CRUD 
+
+1. Get---------  router.get('/users',getUsers)   
+	a. lo que queremos que haga cuando visite la ruta users , se lo enviamos con una función  que lomanejamos desde una carpeta aparate  en este caso controllers y su archivo index.contraollers,ts
+
+	export function getUsers(req:Request, res:Response){
+res.send('hello users de rosalee')
+} 
+	b. Ahora que ya tengo la ruta y la función que esta respondiendo, toca hacer la conexion pra poder efectuar la peticion a postgresql y nos envia la info de la base 
+
+
+	import { Request, Response } from "express"
+import{ pool } from '../db'
+import { QueryResult }   from "pg";
+
+
+export const  getUsers=async(req:Request, res:Response){
+ const response:QueryResult=   await pool.query('SELECT * FROM users');
+ console.log(response.rows)
+res.status(200).json(response.rows);    }
+
+
+
+import { Request, Response } from "express"
+import{ pool } from '../db'
+import { QueryResult }   from "pg";
+
+
+export const  getUsers=async(req:Request, res:Response): Promise<Response>=>{
+    try {
+        const response:QueryResult=   await pool.query('SELECT * FROM users');
+        return res.status(200).json(response.rows);        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json('Internal server error');
+    }
+    }
+
+
+
+2. Post -----------------
+
+
+
+
+
+
+
+
+
+
+ 
